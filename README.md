@@ -22,21 +22,22 @@ Welcome to the **Jub Jub Hotel Management System**! This program simulates a hot
 2. Ensure you have Python installed on your machine.
 3. Install the required library by running:
    ```bash
-   pip install pandas
-Run the script:
-bash
-Copy code
-python jub_jub_hotel.py
-Usage
+   pip install pandas# JubJubHotel_OOD
+4. Run the program using:
+   ```bash
+   python3 jub_jub_hotel.py
+   ```
+## Usage
 Upon running the program, you will see a menu with the following options:
 
-Check in guest: Input the number of guests based on their travel methods.
-Check available room: Display the count and list of available rooms.
-Check detail roomID: View the guest assigned to a specific room.
-Delete guest from roomID: Remove a guest from a specified room.
-Export CSV file: Save the current room assignments to a CSV file.
-Exit: Close the program.
-Example Interaction
+1. Check in guest: Input the number of guests based on their travel methods.
+2. Check available room: Display the count and list of available rooms.
+3. Check detail roomID: View the guest assigned to a specific room.
+4. Delete guest from roomID: Remove a guest from a specified room.
+5. Export CSV file: Save the current room assignments to a CSV file.
+6. Exit: Close the program.
+
+## Example Interaction
 
 Welcome to Jub Jub Hotel
 ------------------------------
@@ -52,11 +53,11 @@ Number of guests from 'walk': 2
 Number of guests from 'car': 1
 Number of guests from 'boat': 0
 Number of guests from 'plane': 1
-#RoomID	Guest
-#1	Visitor(walk)
-#2	Visitor(walk)
-#3	Visitor(car)
-#4	Visitor(plane)
+#RoomID  Guest
+#1       Visitor(walk)
+#2       Visitor(walk)
+#3       Visitor(car)
+#4       Visitor(plane)
 ...
 
 ## Contributing
