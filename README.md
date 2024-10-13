@@ -60,12 +60,6 @@ Number of guests from 'plane': 1
 #4       Visitor(plane)
 ...
 
-## Contributing
-Feel free to fork the repository and submit pull requests. Any contributions or suggestions for improvements are welcome!
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Acknowledgments
 The idea for this project is inspired by hotel management systems and is designed for educational purposes.
 
