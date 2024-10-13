@@ -22,7 +22,7 @@ Welcome to the **Jub Jub Hotel Management System**! This program simulates a hot
 2. Ensure you have Python installed on your machine.
 3. Install the required library by running:
    ```bash
-   pip install pandas# JubJubHotel_OOD
+   pip install pandas
 4. Run the program using:
    ```bash
    python3 jub_jub_hotel.py
