@@ -30,12 +30,12 @@ Welcome to the **Jub Jub Hotel Management System**! This program simulates a hot
 ## Usage
 Upon running the program, you will see a menu with the following options:
 
-1. Check in guest: Input the number of guests based on their travel methods.
-2. Check available room: Display the count and list of available rooms.
-3. Check detail roomID: View the guest assigned to a specific room.
-4. Delete guest from roomID: Remove a guest from a specified room.
-5. Export CSV file: Save the current room assignments to a CSV file.
-6. Exit: Close the program.
+- Check in guest: Input the number of guests based on their travel methods.
+- Check available room: Display the count and list of available rooms.
+- Check detail roomID: View the guest assigned to a specific room.
+- Delete guest from roomID: Remove a guest from a specified room.
+- Export CSV file: Save the current room assignments to a CSV file.
+- Exit: Close the program.
 
 ## Example Interaction
 
