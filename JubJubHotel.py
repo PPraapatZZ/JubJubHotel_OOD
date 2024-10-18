@@ -63,7 +63,6 @@ class InfiniteHotel:
     
     def binary_search_empty_room(self, low: int, high: int) -> int:
         high = min(high, self.total_rooms - 1) 
-        print(f"Searching for empty room between {low} and {high}")
         if low > high:
             return self.binary_search_empty_room(0, high)
         
