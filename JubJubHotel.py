@@ -46,6 +46,25 @@ class InfiniteHotel:
         travel_value = travel_values[travel_method]
         return (2 ** guest_number * 3 ** travel_value) % self.total_rooms
 
+
+    def binary_search_empty_room(self, low: int, high: int) -> int:
+       # binary search to find the first empty room
+        if low > high:
+            return -1
+        mid = (low + high) // 2
+        
+        if self.rooms[mid] is None:
+            if mid == 0 or self.rooms[mid - 1] is not None: # previous room is not empty
+                return mid
+            return self.binary_search_empty_room(low, mid - 1)
+        
+        else:
+            return self.binary_search_empty_room(mid + 1, high)
+        
+    def find_empty_room(self) -> int:
+        """Public method to find the first empty room."""
+        return self.binary_search_empty_room(0, self.total_rooms - 1)
+    
     def expand_hotel(self, factor: int) -> None:
         self.total_rooms *= factor
         self.rooms = [None] * self.total_rooms
@@ -70,10 +89,17 @@ class InfiniteHotel:
 
     def add_new_guest(self, guest_number: int, travel_method: str) -> None:
         room_id = self.calculate_room_id(guest_number, travel_method)
-        # while self.rooms[room_id] is not None:
-        #     room_id = (room_id + 1) % self.total_rooms
-        self.assign_guest_to_room(room_id, travel_method)
-
+        
+        if self.rooms[room_id] is not None:
+            while self.rooms[room_id] is not None:
+                room_id = self.find_empty_room()
+        
+            
+        if room_id != -1:
+            self.assign_guest_to_room(room_id, travel_method)
+        else:
+            print("No available room for this guest")
+      
     def check_in_guests(self, guests: list[int]) -> None:
         guest_distribution = {"walk": guests[0], "car": guests[1], "boat": guests[2], "plane": guests[3]}
         total_guests = sum(guest_distribution.values())
