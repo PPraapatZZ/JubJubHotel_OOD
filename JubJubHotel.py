@@ -27,7 +27,14 @@ class InfiniteHotel:
         data = [{'RoomID': i + 1, 'Guest': room.travel_method if room else 'None'} for i, room in enumerate(self.rooms)]
         df = pd.DataFrame(data)
         df.to_csv(file_path, index=False)
-
+    
+    def get_detail(self, room_id: int) -> str:
+        return f"RoomID: {room_id} - Guest: {self.rooms[room_id - 1]}"
+    
+    def set_room_count(self, room_count: int) -> None:
+        self.total_rooms = room_count
+        self.rooms = [None] * room_count
+    
     def available_room_count(self) -> int:
         return self.total_rooms - self.guest_count
 
@@ -36,17 +43,13 @@ class InfiniteHotel:
 
     def calculate_room_id(self, guest_number: int, travel_method: str) -> int:
         travel_values = {'walk': 1, 'car': 2, 'boat': 3, 'plane': 4}
-        travel_value = travel_values.get(travel_method, 1)
+        travel_value = travel_values[travel_method]
         return (2 ** guest_number * 3 ** travel_value) % self.total_rooms
 
     def expand_hotel(self, factor: int) -> None:
-        previous_rooms = self.rooms.copy()
         self.total_rooms *= factor
         self.rooms = [None] * self.total_rooms
         self.guest_count = 0
-        for guest in previous_rooms:
-            if guest:
-                self.assign_guest_to_room(self.calculate_room_id(self.guest_count, guest.travel_method), guest.travel_method)
         print(f"Hotel size increased to {self.total_rooms} rooms.")
 
     def remove_guest_from_room(self, room_id: int) -> bool:
@@ -56,6 +59,9 @@ class InfiniteHotel:
             return True
         return False
 
+    def room_is_empty(self, room_id: int) -> bool:
+        return self.rooms[room_id] is None
+    
     def assign_guest_to_room(self, room_id: int, travel_method: str) -> None:
         if self.rooms[room_id] is None:
             self.rooms[room_id] = Visitor(travel_method)
@@ -64,8 +70,8 @@ class InfiniteHotel:
 
     def add_new_guest(self, guest_number: int, travel_method: str) -> None:
         room_id = self.calculate_room_id(guest_number, travel_method)
-        while self.rooms[room_id] is not None:
-            room_id = (room_id + 1) % self.total_rooms
+        # while self.rooms[room_id] is not None:
+        #     room_id = (room_id + 1) % self.total_rooms
         self.assign_guest_to_room(room_id, travel_method)
 
     def check_in_guests(self, guests: list[int]) -> None:
@@ -85,8 +91,17 @@ class InfiniteHotel:
             expansion_factor = math.ceil((total_guests + current_room_count) / current_room_count) + 1
             previous_guests = self.current_guests.copy()
             self.expand_hotel(expansion_factor)
-            for i, previous_guest in enumerate(previous_guests):
-                self.add_new_guest(i, previous_guest.travel_method)
+            
+            for guest in previous_guests:
+                if guest.travel_method == "walk":
+                    guest_distribution["walk"] += 1
+                elif guest.travel_method == "car":
+                    guest_distribution["car"] += 1
+                elif guest.travel_method == "boat":
+                    guest_distribution["boat"] += 1
+                elif guest.travel_method == "plane":
+                    guest_distribution["plane"] += 1
+                
             for travel_method, guest_count in guest_distribution.items():
                 for guest in range(guest_count):
                     self.add_new_guest(guest, travel_method) 
@@ -96,9 +111,10 @@ MENU = '''
 1. Check in guest
 2. Check available room
 3. Check detail roomID
-4. Delete guest from roomID
-5. Export CSV file
-6. Exit
+4. Check out guest 
+5. Check in guest to roomID
+6. Export CSV file
+7. Exit
 ------------------------------
 '''
 
@@ -109,7 +125,7 @@ def get_guest_input() -> list[int]:
     plane_guests = int(input("Number of guests from 'plane': "))
     return [walk_guests, car_guests, boat_guests, plane_guests]
 
-jub_jub_hotel = InfiniteHotel(room_count=1)
+jub_jub_hotel = InfiniteHotel(room_count=0)
 print("Welcome to Jub Jub Hotel")
 while True:
     print(MENU)
@@ -122,6 +138,12 @@ while True:
                 if any(guest < 0 for guest in guests):
                     print("Guest number must be positive")
                     continue
+                
+                if jub_jub_hotel.total_rooms == 0:
+                    room_count = sum(guests)
+                    jub_jub_hotel.set_room_count(room_count)
+                    print(f"Hotel has been created with {room_count} rooms")
+                    
                 jub_jub_hotel.check_in_guests(guests)
                 print(jub_jub_hotel)
                 print(f"Total rooms: {jub_jub_hotel.total_rooms}")
@@ -131,19 +153,39 @@ while True:
                 print(f"Available rooms: {jub_jub_hotel.available_room_count()} - {jub_jub_hotel.available_room_list()}")
             case 3:  # Check detail roomID
                 room_id = int(input("Enter roomID: "))
-                print(f"RoomID: {room_id} - Guest: {jub_jub_hotel.rooms[room_id - 1]}")
-            case 4:  # Delete guest from roomID
+                if room_id < 1 or room_id > jub_jub_hotel.total_rooms:
+                    print(f"Invalid roomID. Please enter a roomID between 1 and {jub_jub_hotel.total_rooms}")
+                    continue
+                print(jub_jub_hotel.get_detail(room_id))
+                
+            case 4:  # Check-out guest from roomID
                 room_id = int(input("Enter roomID: "))
                 if jub_jub_hotel.remove_guest_from_room(room_id - 1):
-                    print(f"Guest in roomID {room_id} has been deleted")
+                    print(f"Guest has been checked out from roomID {room_id}")
                 else:
                     print(f"RoomID {room_id} is already empty")
-            case 5:  # Export CSV file
+                    
+            case 5:  # Check in guest to roomID
+                room_id = int(input("Enter roomID: "))
+                travel_method = input("Enter travel method(walk, car, boat, plane): ")
+                if room_id < 1 or room_id > jub_jub_hotel.total_rooms:
+                    print(f"Invalid roomID. Please enter a roomID between 1 and {jub_jub_hotel.total_rooms}")
+                    continue
+                
+                if not jub_jub_hotel.room_is_empty(room_id - 1):
+                    print(f"RoomID {room_id} is already occupied")
+                    continue  
+                
+                jub_jub_hotel.assign_guest_to_room(room_id - 1, travel_method)
+                print(f"Guest has been checked in to roomID {room_id}")
+                print(jub_jub_hotel)
+                
+            case 6:  # Export CSV file
                 current_directory = os.getcwd()
                 file_path = os.path.join(current_directory, 'Jub_Jub_Hotel.csv')
                 jub_jub_hotel.save_to_csv(file_path)
                 print(f"Exported to {file_path}")
-            case 6:  # Exit
+            case 7:  # Exit
                 print("Goodbye Jub Jub ❤️")
                 break
             case _:
