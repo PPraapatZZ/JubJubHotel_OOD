@@ -1,6 +1,8 @@
 import math
 import pandas as pd
 import os
+import time
+import tracemalloc
 
 class Visitor:
     def __init__(self, travel_method: str, number: int):
@@ -15,6 +17,7 @@ class InfiniteHotel:
     travel_values = {'walk': 1, 'car': 2, 'boat': 3, 'plane': 4}
     
     def __init__(self, room_count: int):
+        tracemalloc.start()
         self.total_rooms = room_count
         self.rooms = [None] * room_count
         self.guest_count = 0
@@ -26,6 +29,7 @@ class InfiniteHotel:
             "boat": 0,
             "plane": 0
         }
+        self.memory_usage()
         
 
     def __str__(self) -> str:
@@ -162,6 +166,11 @@ class InfiniteHotel:
             for travel_method, guest_count in guest_distribution.items():
                 for guest in range(guest_count):
                     self.add_new_guest(guest, travel_method) 
+    
+    def memory_usage(self):
+        current = tracemalloc.get_traced_memory()
+        print(f"Current memory usage: {current / 10**6:.2f} MB")
+
                     
 MENU = '''
 ------------------------------
@@ -171,7 +180,8 @@ MENU = '''
 4. Check out guest 
 5. Check in guest to roomID
 6. Export CSV file
-7. Exit
+7. Check Memory usage
+8. Exit
 ------------------------------
 '''
 
@@ -192,6 +202,7 @@ while True:
         match service:
             case 1:  # Check in guest
                 guests = get_guest_input()
+                start = time.time()
                 if any(guest < 0 for guest in guests):
                     print("Guest number must be positive")
                     continue
@@ -202,29 +213,37 @@ while True:
                     print(f"Hotel has been created with {room_count} rooms")
                     
                 jub_jub_hotel.check_in_guests(guests)
+                end = time.time()
                 print(jub_jub_hotel)
                 print(f"Total rooms: {jub_jub_hotel.total_rooms}")
                 print(f"Available rooms: {jub_jub_hotel.available_room_count()} - {jub_jub_hotel.available_room_list()}")
                 print("")
             case 2:  # Check available room
+                start = time.time()
                 print(f"Available rooms: {jub_jub_hotel.available_room_count()} - {jub_jub_hotel.available_room_list()}")
+                end = time.time()
             case 3:  # Check detail roomID
                 room_id = int(input("Enter roomID: "))
+                start = time.time()
                 if room_id < 1 or room_id > jub_jub_hotel.total_rooms:
                     print(f"Invalid roomID. Please enter a roomID between 1 and {jub_jub_hotel.total_rooms}")
                     continue
                 print(jub_jub_hotel.get_detail(room_id))
+                end = time.time()
                 
             case 4:  # Check-out guest from roomID
                 room_id = int(input("Enter roomID: "))
+                start = time.time()
                 if jub_jub_hotel.remove_guest_from_room(room_id - 1):
                     print(f"Guest has been checked out from roomID {room_id}")
                 else:
                     print(f"RoomID {room_id} is already empty")
+                end = time.time()
                     
             case 5:  # Check in guest to roomID
                 room_id = int(input("Enter roomID: "))
                 travel_method = input("Enter travel method(walk, car, boat, plane): ")
+                start = time.time()
                 if room_id < 1 or room_id > jub_jub_hotel.total_rooms:
                     print(f"Invalid roomID. Please enter a roomID between 1 and {jub_jub_hotel.total_rooms}")
                     continue
@@ -234,15 +253,24 @@ while True:
                     continue  
                 
                 jub_jub_hotel.assign_guest_to_room(room_id - 1, travel_method)
+                end = time.time()
                 print(f"Guest has been checked in to roomID {room_id}")
                 print(jub_jub_hotel)
                 
             case 6:  # Export CSV file
+                start = time.time()
                 current_directory = os.getcwd()
                 file_path = os.path.join(current_directory, 'Jub_Jub_Hotel.csv')
                 jub_jub_hotel.save_to_csv(file_path)
+                end = time.time()
                 print(f"Exported to {file_path}")
-            case 7:  # Exit
+
+            case 7: # Memory usage
+                start = time.time()
+                jub_jub_hotel.memory_usage()
+                end = time.time()
+
+            case 8:  # Exit
                 print("Goodbye Jub Jub ❤️")
                 break
             case _:
@@ -251,3 +279,5 @@ while True:
         print("Invalid input. Please enter a number.")
     except Exception as e:
         print(f"An error occurred: {e}")
+    
+    print(f"Time taken: {end - start:.2f} seconds")
