@@ -168,7 +168,7 @@ class InfiniteHotel:
                     self.add_new_guest(guest, travel_method) 
     
     def memory_usage(self):
-        current = tracemalloc.get_traced_memory()
+        current, peak = tracemalloc.get_traced_memory()
         print(f"Current memory usage: {current / 10**6:.2f} MB")
 
                     
